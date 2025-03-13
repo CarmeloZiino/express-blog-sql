@@ -1,5 +1,6 @@
 const express = require("express"); //Richiama l'utilizzo di Express
 const cors = require("cors")
+const db = require("./data/posts_db")
 
 const app = express(); //Definisce Express nella costante app
 const port = 3000; //Definisce una porta alla quale assegnare i comandi
@@ -23,9 +24,18 @@ app.use(express.json());
 
 app.use("/posts", postsRouter);
 
-app.get("/", (req, res) => {
-  res.send(`Server della mia pizzeria`);
+
+// Endpoint per ottenere tutti i post
+app.get('/', (req, res) => {
+  db.query('SELECT * FROM posts', (err, results) => {
+    if (err) {
+      console.error('Errore nella query:', err);
+      return res.status(500).json({ error: 'Errore nel server' });
+    }
+    res.json(results); // Restituisce i risultati come JSON
+  });
 });
+
 
 app.use(errorsHandler);
 app.use (notFound);
